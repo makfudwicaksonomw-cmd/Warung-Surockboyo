@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Admin — Warung Digital</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div id="setup-warning" class="setup-banner" style="display:none;">
+  ⚠️ Firebase belum dikonfigurasi. Buka <code>assets/js/firebase-config.js</code> dan ikuti README.md
+</div>
+
+<!-- ===================== LOGIN ===================== -->
+<div class="admin-login" id="view-login">
+  <div class="admin-login-card">
+    <div class="icon">🔐</div>
+    <h2 style="font-family:var(--font-display);margin:0 0 6px;">Admin Login</h2>
+    <p style="font-size:13px;color:var(--color-muted);margin:0 0 18px;">Masukkan password untuk mengelola aplikasi</p>
+    <input class="input-field" type="password" id="login-password" placeholder="Password">
+    <button class="primary-btn" id="login-btn">Masuk</button>
+    <p id="login-error" style="color:var(--color-danger);font-size:12.5px;margin-top:10px;display:none;">Password salah, coba lagi.</p>
+  </div>
+</div>
+
+<!-- ===================== DASHBOARD ADMIN ===================== -->
+<div class="admin-shell" id="view-admin" style="display:none;">
+  <div class="admin-nav" id="admin-nav">
+    <button data-tab="dashboard" class="active">📊 Dashboard</button>
+    <button data-tab="menu">🍽️ Menu</button>
+    <button data-tab="banner">🖼️ Banner</button>
+    <button data-tab="orders">📋 Pesanan <span class="tab-badge" id="pending-badge">0</span></button>
+    <button data-tab="laporan">📈 Laporan</button>
+    <button data-tab="display">🎨 Tampilan</button>
+    <button data-tab="qrcode">📱 QR Code</button>
+    <button data-tab="logout" style="margin-left:auto;">🚪 Keluar</button>
+  </div>
+
+  <div class="admin-content">
+
+    <!-- --- TAB: DASHBOARD --- -->
+    <div class="tab-panel" id="tab-dashboard">
+      <div class="admin-stats">
+        <div class="stat-card"><div class="num" id="stat-orders-today">0</div><div class="lbl">Pesanan Hari Ini</div></div>
+        <div class="stat-card"><div class="num" id="stat-sales-today">Rp 0</div><div class="lbl">Penjualan Hari Ini</div></div>
+        <div class="stat-card"><div class="num" id="stat-menu-count">0</div><div class="lbl">Jumlah Menu</div></div>
+        <div class="stat-card"><div class="num" id="stat-processing">0</div><div class="lbl">Sedang Diproses</div></div>
+      </div>
+      <div class="admin-section-title">Pesanan Terbaru</div>
+      <div id="recent-orders-list"></div>
+    </div>
+
+    <!-- --- TAB: MENU --- -->
+    <div class="tab-panel" id="tab-menu" style="display:none;">
+      <div class="admin-section-title">Daftar Menu <button class="add-link" id="btn-add-menu">+ Tambah Menu</button></div>
+      <div id="menu-list"></div>
+    </div>
+
+    <!-- --- TAB: BANNER --- -->
+    <div class="tab-panel" id="tab-banner" style="display:none;">
+      <div class="admin-section-title">Banner Promo <button class="add-link" id="btn-add-banner">+ Tambah Banner</button></div>
+      <p style="font-size:12.5px;color:var(--color-muted);">Banner tampil sebagai slider di halaman customer, sesuai urutan.</p>
+      <div id="banner-list"></div>
+    </div>
+
+    <!-- --- TAB: PESANAN --- -->
+    <div class="tab-panel" id="tab-orders" style="display:none;">
+      <div class="admin-section-title">Kelola Pesanan</div>
+      <div class="category-tabs" id="order-filter-tabs" style="padding:0 0 12px;">
+        <button class="category-tab active" data-status="semua">Semua</button>
+        <button class="category-tab" data-status="menunggu">Menunggu</button>
+        <button class="category-tab" data-status="diproses">Diproses</button>
+        <button class="category-tab" data-status="dimasak">Dimasak</button>
+        <button class="category-tab" data-status="siap">Siap Diambil</button>
+        <button class="category-tab" data-status="selesai">Selesai</button>
+      </div>
+      <div id="orders-list"></div>
+    </div>
+
+    <!-- --- TAB: LAPORAN --- -->
+    <div class="tab-panel" id="tab-laporan" style="display:none;">
+      <div class="admin-section-title">Laporan Penjualan</div>
+      <div class="admin-stats">
+        <div class="stat-card"><div class="num" id="report-today">Rp 0</div><div class="lbl">Hari Ini</div></div>
+        <div class="stat-card"><div class="num" id="report-week">Rp 0</div><div class="lbl">7 Hari Terakhir</div></div>
+        <div class="stat-card"><div class="num" id="report-month">Rp 0</div><div class="lbl">Bulan Ini</div></div>
+        <div class="stat-card"><div class="num" id="report-month-orders">0</div><div class="lbl">Pesanan Bulan Ini</div></div>
+      </div>
+      <div class="admin-section-title">Riwayat Harian (14 hari terakhir)</div>
+      <div id="daily-sales-bars"></div>
+      <p class="hint">Pesanan berstatus "Selesai" otomatis dihapus dari daftar Pesanan setelah 24 jam untuk menghemat penyimpanan. Angka penjualan di sini tetap tersimpan permanen walau detail pesanannya sudah terhapus.</p>
+    </div>
+
+    <!-- --- TAB: TAMPILAN --- -->
+    <div class="tab-panel" id="tab-display" style="display:none;">
+      <div class="admin-section-title">Pengaturan Tampilan</div>
+      <div class="admin-form">
+        <label>Nama Restoran</label>
+        <input class="input-field" id="set-restaurant-name">
+        <label>Tagline Singkat</label>
+        <input class="input-field" id="set-tagline">
+
+        <label>Logo (JPG)</label>
+        <div class="upload-drop" id="logo-drop">Klik untuk upload logo, atau tempel link gambar di bawah</div>
+        <input type="file" id="logo-file" accept="image/*" style="display:none;">
+        <input class="input-field" id="logo-url" placeholder="atau tempel link gambar (URL)" style="margin-top:8px;">
+        <img id="logo-preview" class="upload-preview" style="display:none;">
+
+        <label>Warna Utama (tombol & aksen)</label>
+        <div class="color-swatch-row"><input type="color" id="set-primary-color"><span id="set-primary-color-hex">#C1432D</span></div>
+        <label>Warna Header</label>
+        <div class="color-swatch-row"><input type="color" id="set-header-color"><span id="set-header-color-hex">#2B2420</span></div>
+        <label>Warna Footer</label>
+        <div class="color-swatch-row"><input type="color" id="set-footer-color"><span id="set-footer-color-hex">#2B2420</span></div>
+        <label>Warna Background</label>
+        <div class="color-swatch-row"><input type="color" id="set-bg-color"><span id="set-bg-color-hex">#FBF6EC</span></div>
+
+        <label>Ganti Password Admin</label>
+        <input class="input-field" id="set-password" placeholder="Password baru">
+        <p class="hint">Kosongkan jika tidak ingin mengganti password.</p>
+
+        <button class="primary-btn" id="save-display-btn">Simpan Perubahan</button>
+      </div>
+    </div>
+
+    <!-- --- TAB: QR CODE --- -->
+    <div class="tab-panel" id="tab-qrcode" style="display:none;">
+      <div class="admin-section-title">QR Code Pemesanan</div>
+      <div class="admin-form">
+        <label>Alamat Website Anda (setelah di-deploy ke GitHub Pages)</label>
+        <input class="input-field" id="set-deployed-url" placeholder="https://namauser.github.io/nama-repo/customer/">
+        <label>Nomor Meja (opsional, buat QR khusus per meja)</label>
+        <input class="input-field" id="qr-table-number" placeholder="Contoh: 5">
+        <button class="primary-btn" id="generate-qr-btn">Buat QR Code</button>
+      </div>
+      <div class="qr-box" style="margin-top:16px;">
+        <div id="qrcode"></div>
+        <p id="qr-url-preview" style="font-size:12px;color:var(--color-muted);word-break:break-all;"></p>
+        <button class="ghost-btn" id="download-qr-btn" style="display:none;">Download QR (PNG)</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== MODAL: TAMBAH/EDIT MENU ===================== -->
+<div class="sheet-overlay" id="sheet-menu-form">
+  <div class="sheet" style="position:relative;">
+    <button class="sheet-close" id="close-menu-form">✕</button>
+    <div class="sheet-handle"></div>
+    <div class="admin-form">
+      <h3 style="font-family:var(--font-display);margin:14px 0;" id="menu-form-title">Tambah Menu</h3>
+
+      <label>Foto Menu (JPG)</label>
+      <div class="upload-drop" id="menu-image-drop">Klik untuk upload foto, atau tempel link gambar di bawah</div>
+      <input type="file" id="menu-image-file" accept="image/*" style="display:none;">
+      <input class="input-field" id="menu-image-url" placeholder="atau tempel link gambar (URL)" style="margin-top:8px;">
+      <img id="menu-image-preview" class="upload-preview" style="display:none;">
+
+      <label>Nama Menu</label>
+      <input class="input-field" id="menu-name" placeholder="Contoh: Ayam Geprek">
+      <label>Harga (Rp)</label>
+      <input class="input-field" id="menu-price" type="number" placeholder="15000">
+      <label>Deskripsi Singkat</label>
+      <textarea class="note-input" id="menu-desc" placeholder="Deskripsi menu..."></textarea>
+      <label>Kategori</label>
+      <input class="input-field" id="menu-category" placeholder="Contoh: Makanan, Minuman, Snack, Paket" list="category-suggestions">
+      <datalist id="category-suggestions"></datalist>
+      <label>Status</label>
+      <div class="status-select">
+        <button type="button" class="status-pill active" data-status="tersedia">Tersedia</button>
+        <button type="button" class="status-pill" data-status="habis">Habis</button>
+      </div>
+
+      <label>Varian Menu (opsional)</label>
+      <p class="hint">Contoh: nama grup "Level Pedas", opsi "Level 1, Level 2, Level 3"</p>
+      <div id="variant-groups-list"></div>
+      <button class="ghost-btn" id="add-variant-group-btn" type="button">+ Tambah Grup Varian</button>
+
+      <button class="primary-btn" id="save-menu-btn">Simpan Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: TAMBAH BANNER ===================== -->
+<div class="sheet-overlay" id="sheet-banner-form">
+  <div class="sheet" style="position:relative;">
+    <button class="sheet-close" id="close-banner-form">✕</button>
+    <div class="sheet-handle"></div>
+    <div class="admin-form">
+      <h3 style="font-family:var(--font-display);margin:14px 0;">Tambah Banner</h3>
+      <label>Gambar Banner (JPG, disarankan rasio 16:7)</label>
+      <div class="upload-drop" id="banner-image-drop">Klik untuk upload gambar, atau tempel link di bawah</div>
+      <input type="file" id="banner-image-file" accept="image/*" style="display:none;">
+      <input class="input-field" id="banner-image-url" placeholder="atau tempel link gambar (URL)" style="margin-top:8px;">
+      <img id="banner-image-preview" class="upload-preview" style="display:none;">
+      <button class="primary-btn" id="save-banner-btn">Simpan Banner</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: DETAIL PESANAN ===================== -->
+<div class="sheet-overlay" id="sheet-order-detail">
+  <div class="sheet" style="position:relative;">
+    <button class="sheet-close" id="close-order-detail">✕</button>
+    <div class="sheet-handle"></div>
+    <div class="admin-form" id="order-detail-content"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="../assets/js/firebase-config.js"></script>
+<script src="../assets/js/shared.js"></script>
+<script src="../assets/js/admin.js"></script>
+</body>
+</html>

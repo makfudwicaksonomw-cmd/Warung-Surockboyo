@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pesan Makanan</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div id="setup-warning" class="setup-banner" style="display:none;">
+  ⚠️ Firebase belum dikonfigurasi. Buka <code>assets/js/firebase-config.js</code> dan ikuti README.md
+</div>
+
+<div class="app-shell" id="app-shell">
+
+  <!-- ===================== HALAMAN MENU ===================== -->
+  <div id="view-menu">
+    <header class="app-header">
+      <div class="logo-row">
+        <img id="logo-img" class="logo-img" src="" alt="Logo" style="display:none;">
+        <div>
+          <h1 class="restaurant-name" id="restaurant-name">Warung Saya</h1>
+          <div class="restaurant-tagline" id="restaurant-tagline">Pesan cepat, langsung dimasak</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="banner-slider" id="banner-slider" style="display:none;">
+      <div id="banner-slides"></div>
+      <div class="banner-dots" id="banner-dots"></div>
+    </div>
+
+    <div class="category-tabs" id="category-tabs"></div>
+
+    <div class="menu-section" id="menu-section">
+      <!-- diisi JS -->
+    </div>
+
+    <button class="cart-fab hidden" id="cart-fab">
+      <span><span class="count" id="cart-count">0</span>Lihat Keranjang</span>
+      <span id="cart-total">Rp 0</span>
+    </button>
+  </div>
+
+  <!-- ===================== HALAMAN STATUS PESANAN ===================== -->
+  <div id="view-order-status" style="display:none;">
+    <header class="app-header">
+      <div class="logo-row">
+        <img id="logo-img-2" class="logo-img" src="" alt="Logo" style="display:none;">
+        <div>
+          <h1 class="restaurant-name" id="restaurant-name-2">Warung Saya</h1>
+          <div class="restaurant-tagline">Status pesanan Anda</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="ticket" id="ticket">
+      <div class="stamp" id="ticket-stamp">🧾</div>
+      <h2>Pesanan Diterima</h2>
+      <div class="order-no" id="order-no">#0000</div>
+
+      <div class="status-track" id="status-track"></div>
+
+      <div class="eta-box" id="eta-box" style="display:none;">
+        Estimasi selesai: <b id="eta-value">-</b>
+      </div>
+    </div>
+
+    <div style="padding: 0 20px;">
+      <div class="admin-card" style="display:block;">
+        <div class="info">
+          <div class="t" style="margin-bottom:8px;">Ringkasan Pesanan</div>
+          <div id="order-summary-items" style="font-size:13px;"></div>
+          <div class="cart-totals">
+            <div class="row grand"><span>Total</span><span id="order-summary-total">Rp 0</span></div>
+          </div>
+        </div>
+      </div>
+      <button class="ghost-btn" id="btn-new-order">Pesan Lagi</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== SHEET: DETAIL MENU ===================== -->
+<div class="sheet-overlay" id="sheet-detail">
+  <div class="sheet" style="position:relative;">
+    <button class="sheet-close" id="close-detail">✕</button>
+    <div class="sheet-handle"></div>
+    <img class="detail-photo" id="detail-photo" src="" alt="">
+    <div class="detail-name" id="detail-name"></div>
+    <div class="detail-price" id="detail-price"></div>
+    <p class="detail-desc" id="detail-desc"></p>
+
+    <div id="detail-variants"></div>
+
+    <div class="field-label">Jumlah</div>
+    <div class="qty-stepper">
+      <button id="qty-minus" type="button">−</button>
+      <span class="qty-val" id="qty-val">1</span>
+      <button id="qty-plus" type="button">+</button>
+    </div>
+
+    <div class="field-label">Catatan (opsional)</div>
+    <textarea class="note-input" id="note-input" placeholder="Contoh: tidak pedas, tanpa bawang..."></textarea>
+
+    <button class="primary-btn" id="add-to-cart-btn">Tambah ke Keranjang</button>
+  </div>
+</div>
+
+<!-- ===================== SHEET: KERANJANG ===================== -->
+<div class="sheet-overlay" id="sheet-cart">
+  <div class="sheet" style="position:relative;">
+    <button class="sheet-close" id="close-cart">✕</button>
+    <div class="sheet-handle"></div>
+    <div class="field-label" style="margin-top:10px;">Keranjang Saya</div>
+    <div id="cart-list"></div>
+    <div class="cart-totals" id="cart-totals-box" style="display:none;">
+      <div class="row grand"><span>Total</span><span id="cart-grand-total">Rp 0</span></div>
+    </div>
+    <button class="primary-btn" id="checkout-btn" style="display:none;">Checkout</button>
+  </div>
+</div>
+
+<!-- ===================== SHEET: CHECKOUT ===================== -->
+<div class="sheet-overlay" id="sheet-checkout">
+  <div class="sheet" style="position:relative;">
+    <button class="sheet-close" id="close-checkout">✕</button>
+    <div class="sheet-handle"></div>
+    <div class="field-label" style="margin-top:10px;">Data Pemesan</div>
+    <input class="input-field" id="checkout-name" placeholder="Nama Anda *" required>
+    <input class="input-field" id="checkout-table" placeholder="Nomor Meja (opsional)">
+    <input class="input-field" id="checkout-wa" placeholder="Nomor WhatsApp (opsional)" type="tel">
+    <button class="primary-btn" id="submit-order-btn">Pesan Sekarang</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="../assets/js/firebase-config.js"></script>
+<script src="../assets/js/shared.js"></script>
+<script src="../assets/js/customer.js"></script>
+</body>
+</html>

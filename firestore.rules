@@ -1,0 +1,23 @@
+// ============================================================
+// FIRESTORE SECURITY RULES — Warung Digital
+// ------------------------------------------------------------
+// Cara pakai:
+// 1. Buka Firebase Console > Firestore Database > tab "Rules"
+// 2. Hapus isi yang ada, tempel isi file ini
+// 3. Klik "Publish"
+//
+// Aturan ini membiarkan SIAPA SAJA baca & tulis data (karena aplikasi
+// ini tidak memakai sistem login pengguna/Firebase Auth, hanya
+// password sederhana di sisi admin). Cukup aman untuk skala UMKM,
+// tapi siapa pun yang tahu project ID bisa mengakses API ini secara
+// teknis. Jangan simpan data sensitif (kartu kredit dll) di database ini.
+// ============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warung Digital</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .landing{ min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:20px; text-align:center; }
+  .landing h1{ font-family:var(--font-display); }
+  .landing a.btn{
+    display:block; width:100%; max-width:300px; padding:14px; border-radius:100px;
+    background:var(--color-primary); color:#fff; font-weight:700; margin-top:8px;
+  }
+  .landing a.btn.secondary{ background:transparent; border:1.5px solid var(--color-border); color:var(--color-ink); }
+</style>
+</head>
+<body>
+  <div class="landing">
+    <h1>🍽️ Warung Digital</h1>
+    <p style="color:var(--color-muted);max-width:320px;">
+      Pelanggan biasanya masuk lewat scan QR Code langsung ke halaman menu.
+      Halaman ini hanya jalan pintas untuk Anda.
+    </p>
+    <a class="btn" href="customer/index.html">Buka Halaman Pemesanan (Customer)</a>
+    <a class="btn secondary" href="admin/index.html">Buka Dashboard Admin</a>
+  </div>
+</body>
+</html>
